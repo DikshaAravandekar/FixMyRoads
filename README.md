@@ -28,34 +28,35 @@ The application also provides an administrator dashboard to review complaints an
 ## 🖥️ Screenshots
 
 ### 1. Home Page
-![FixMyRoads Home Page](screenshots/01-homepage.png)
+![FixMyRoads Home Page](screenshots/home.png)
 
 ### 2. User Registration
-![User Registration](screenshots/02-signup.png)
+![User Registration](screenshots/signup.png)
 
 ### 3. User Sign In
-![User Sign In](screenshots/03-signin.png)
+![User Sign In](screenshots/signin.png)
 
 ### 4. User Dashboard
-![User Dashboard](screenshots/04-user-dashboard.png)
+![User Dashboard](screenshots/user-dashboard.png)
 
 ### 5. Report a Road Issue
-![Report a Road Issue](screenshots/05-report-issue.png)
+![Report a Road Issue](screenshots/report-issue.png)
 
 ### 6. Photo Upload and Location Details
-![Photo Upload and Location](screenshots/06-upload-photo-location.png)
+![Photo Upload and Location](screenshots/upload-photo-location.png)
 
 ### 7. My Reports
-![My Reports](screenshots/07-my-reports.png)
+![My Reports](screenshots/my-reports.png)
 
 ### 8. Community Reports
-![Community Reports](screenshots/08-community-reports.png)
+![Community Reports](screenshots/community-reports.png)
 
 ### 9. Administrator Sign In
-![Administrator Sign In](screenshots/09-admin-signin.png)
+![Administrator Sign In](screenshots/admin-signin.png)
 
 ### 10. Administrator Dashboard
-![Administrator Dashboard](screenshots/10-admin-dashboard.png)
+![Administrator Dashboard](screenshots/admin-dashboard.png)
+
 
 ## 🧰 Technologies Used
 
