@@ -1,0 +1,335 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login | Fix My Roads</title>
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    :root {
+      --primary: #6558f5;
+      --primary-dark: #5145d8;
+      --page-bg: #f5f7fc;
+      --text: #172033;
+      --muted: #718096;
+      --border: #e5e9f2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 38px 34px 30px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(31, 41, 55, 0.07);
+    }
+
+    .brand {
+      display: block;
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .login-icon {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+      background: #f0edff;
+      color: var(--primary);
+      font-size: 29px;
+    }
+
+    .login-card h1 {
+      margin: 0 0 10px;
+      color: var(--text);
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin: 0 0 30px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 9px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      width: 100%;
+      height: 46px;
+      padding: 0 68px 0 13px;
+      border: 1px solid #dce2ed;
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .password-wrapper input::placeholder {
+      color: #9aa4b5;
+    }
+
+    .password-wrapper input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(101, 88, 245, 0.12);
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      padding: 5px 0;
+      border: none;
+      background: transparent;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toggle-password:hover {
+      color: var(--primary-dark);
+    }
+
+    .login-button {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .login-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(101, 88, 245, 0.2);
+    }
+
+    .login-button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error-message {
+      display: none;
+      margin-bottom: 18px;
+      padding: 12px;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--primary);
+    }
+
+    .security-note {
+      margin-top: 24px;
+      padding-top: 17px;
+      border-top: 1px solid var(--border);
+      color: #8791a4;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
+      .login-card {
+        padding: 30px 22px 24px;
+      }
+
+      .login-card h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-card">
+    <a class="brand" href="/index.html">Fix My Roads</a>
+
+    <div class="login-icon" aria-hidden="true">🛡️</div>
+
+    <h1>Admin Sign In</h1>
+
+    <p class="subtitle">
+      Welcome! Sign in to manage road complaints.
+    </p>
+
+    <div
+      id="errorMessage"
+      class="error-message"
+      role="alert"
+      aria-live="polite"
+    ></div>
+
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label for="pw">Admin Password</label>
+
+        <div class="password-wrapper">
+          <input
+            id="pw"
+            name="password"
+            type="password"
+            placeholder="Enter your admin password"
+            autocomplete="current-password"
+            required
+          />
+
+          <button
+            type="button"
+            id="togglePassword"
+            class="toggle-password"
+          >
+            Show
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" id="ok" class="login-button">
+        Sign In to Dashboard
+      </button>
+    </form>
+
+    <a href="/index.html" class="back-link">
+      &larr; Back to FixMyRoads
+    </a>
+
+    <div class="security-note">
+      🛡️ Secure administrator access
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('adminLoginForm');
+    const passwordInput = document.getElementById('pw');
+    const loginButton = document.getElementById('ok');
+    const errorMessage = document.getElementById('errorMessage');
+    const togglePassword = document.getElementById('togglePassword');
+
+    togglePassword.addEventListener('click', () => {
+      const showPassword = passwordInput.type === 'password';
+
+      passwordInput.type = showPassword ? 'text' : 'password';
+      togglePassword.textContent = showPassword ? 'Hide' : 'Show';
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      errorMessage.style.display = 'none';
+      loginButton.disabled = true;
+      loginButton.textContent = 'Signing in...';
+
+      try {
+        const response = await fetch('/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            password: passwordInput.value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.message || 'Invalid admin password.');
+        }
+
+        window.location.href = '/admin.html';
+      } catch (error) {
+        errorMessage.textContent =
+          error.message || 'Unable to connect to the server.';
+
+        errorMessage.style.display = 'block';
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = 'Sign In to Dashboard';
+      }
+    });
+  </script>
+</body>
+</html>

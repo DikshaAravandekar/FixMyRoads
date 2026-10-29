@@ -1,0 +1,401 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Community Reports | FixMyRoads</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+
+        <a href="index.html" class="brand" id="brandLink">
+            FixMyRoads
+        </a>
+
+        <nav id="userActions" class="nav-actions">
+            <a href="index.html" id="backButton"
+               class="btn secondary-nav">
+                ← Back to Home
+            </a>
+        </nav>
+
+    </div>
+</header>
+
+<main>
+
+    <section class="reports-hero">
+
+        <h1>Community Reports</h1>
+
+        <p>
+            Browse road complaints submitted by citizens.
+            Track their status and help make your city safer.
+        </p>
+
+        <div class="report-count" id="reportCount">
+            Loading...
+        </div>
+
+    </section>
+
+    <section class="reports-toolbar">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search complaints..."
+            aria-label="Search complaints"
+        >
+
+        <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="verified">Verified</option>
+            <option value="in progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+        </select>
+
+    </section>
+
+    <section class="reports-section">
+
+        <div class="reports-card">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Issue</th>
+                        <th>Reported By</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="publicBody">
+                    <tr>
+                        <td colspan="6">
+                            <div class="loading">
+                                Loading Community Reports...
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
+
+    const nav = document.getElementById("userActions");
+    const brand = document.getElementById("brandLink");
+
+    const backPage = from === "dashboard"
+        ? "dashboard.html"
+        : "index.html";
+
+    const backLabel = from === "dashboard"
+        ? "← Back to Dashboard"
+        : "← Back to Home";
+
+    brand.href = backPage;
+
+    let user = null;
+
+    try {
+        user = JSON.parse(localStorage.getItem("dr_user") || "null");
+    } catch (error) {
+        user = null;
+    }
+
+    if (user) {
+    nav.innerHTML = "";
+    }else {
+        nav.innerHTML = `
+            <a href="login.html" class="btn secondary-nav">
+                Sign In
+            </a>
+            <a href="signup.html" class="btn primary-nav">
+                Sign Up
+            </a>
+        `;
+    }
+
+    const backButton = document.createElement("a");
+    backButton.href = backPage;
+    backButton.className = "btn secondary-nav";
+    backButton.textContent = backLabel;
+
+    nav.appendChild(backButton);
+})();
+</script>
+
+
+<script>
+(async function () {
+    const API = window.location.origin + "/api/complaints";
+
+    const tbody = document.getElementById("publicBody");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const reportCount = document.getElementById("reportCount");
+
+    // Preserve the origin when opening complaint details.
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from") === "dashboard"
+        ? "dashboard"
+        : "home";
+
+    try {
+        const res = await fetch(API);
+
+        if (!res.ok) {
+            throw new Error("Failed to fetch complaints");
+        }
+
+        const data = await res.json();
+
+        let complaints = Array.isArray(data)
+            ? data
+            : Array.isArray(data.complaints)
+                ? data.complaints
+                : [];
+
+        // Newest complaints first.
+        complaints.sort((a, b) =>
+            new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+
+        reportCount.textContent =
+            `${complaints.length} complaints reported`;
+
+        if (complaints.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="loading">
+                            <h2>No complaints yet</h2>
+                            <p>No road complaints have been submitted yet.</p>
+                            <a href="report.html?from=${from}"
+                               class="btn hero-btn">
+                                Report the First Issue
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        render(complaints);
+
+        searchInput.addEventListener("input", filterData);
+        statusFilter.addEventListener("change", filterData);
+
+        function filterData() {
+            const search = searchInput.value.trim().toLowerCase();
+            const status = statusFilter.value;
+
+            const filtered = complaints.filter(c => {
+                const title = (c.title || "").toLowerCase();
+                const reporter = (c.createdBy || "Anonymous").toLowerCase();
+                const currentStatus = (c.status || "Pending")
+                    .toLowerCase()
+                    .replace(/[_-]/g, " ")
+                    .trim();
+
+                const matchesSearch =
+                    title.includes(search) ||
+                    reporter.includes(search);
+
+                const matchesStatus =
+                    status === "all" ||
+                    currentStatus === status ||
+                    (currentStatus === "inprogress" &&
+                     status === "in progress");
+
+                return matchesSearch && matchesStatus;
+            });
+
+            render(filtered);
+        }
+
+        function render(list) {
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="loading">
+                                No matching complaints found.
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = list.map(c => {
+                const id = encodeURIComponent(c._id || c.id || "");
+                const imagePath = c.imagePath
+                    ? escapeHtml(c.imagePath)
+                    : "";
+
+                return `
+                    <tr>
+                        <td>
+                            ${
+                                imagePath
+                                ? `<a href="${imagePath}" target="_blank"
+                                      rel="noopener noreferrer">
+                                       <img src="${imagePath}"
+                                            class="thumb"
+                                            alt="Complaint photo">
+                                   </a>`
+                                : `<div class="no-photo">📷</div>`
+                            }
+                        </td>
+
+                        <td>
+                            <div class="issue-title">
+                                ${escapeHtml(c.title || "Road issue")}
+                            </div>
+
+                            <div class="issue-date">
+                                Reported on
+                                ${formatDate(c.createdAt)}
+                            </div>
+                        </td>
+
+                        <td>
+                            ${escapeHtml(c.createdBy || "Anonymous")}
+                        </td>
+
+                        <td>
+                            ${getLocation(c)}
+                        </td>
+
+                        <td>
+                            ${statusChip(c.status)}
+                        </td>
+
+                        <td>
+                            <a
+                                href="complaint.html?id=${id}&from=${from}"
+                                class="btn secondary-nav btn-small">
+                                👁 View Details
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+    } catch (error) {
+        console.error("Community reports error:", error);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    <div class="loading">
+                        <h2>Failed to load complaints</h2>
+                        <p>Please refresh the page and try again.</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    function formatDate(date) {
+        const parsed = new Date(date);
+
+        if (!date || Number.isNaN(parsed.getTime())) {
+            return "Date unavailable";
+        }
+
+        return parsed.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+    function getLocation(c) {
+        if (typeof c.location === "string" && c.location) {
+            return "📍 " + escapeHtml(c.location);
+        }
+
+        if (c.location && typeof c.location === "object") {
+            if (c.location.address) {
+                return "📍 " + escapeHtml(c.location.address);
+            }
+
+            if (c.location.name) {
+                return "📍 " + escapeHtml(c.location.name);
+            }
+        }
+
+        const lat = Number(c.latitude ?? c.location?.latitude);
+        const lng = Number(c.longitude ?? c.location?.longitude);
+
+        if (Number.isFinite(lat) && Number.isFinite(lng) &&
+            (lat !== 0 || lng !== 0)) {
+            return `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        }
+
+        return "📍 Location unavailable";
+    }
+
+    function statusChip(status) {
+        const s = (status || "Pending")
+            .toLowerCase()
+            .replace(/[_-]/g, " ")
+            .trim();
+
+        if (s === "resolved") {
+            return `<span class="status resolved">Resolved</span>`;
+        }
+
+        if (s === "verified") {
+            return `<span class="status verified">Verified</span>`;
+        }
+
+        if (s === "in progress" || s === "inprogress") {
+            return `<span class="status progress">In Progress</span>`;
+        }
+
+        return `<span class="status pending">Pending</span>`;
+    }
+
+    function escapeHtml(value = "") {
+        return String(value).replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+})();
+</script>
+
+</body>
+</html>

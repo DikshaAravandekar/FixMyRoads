@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Report a Road Issue — FixMyRoads</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="header-inner">
+
+        <!-- Logo -->
+        <a href="/index.html" class="brand">
+            FixMyRoads
+        </a>
+
+        <!-- Mobile Menu -->
+        <button class="nav-toggle" id="navToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Navigation -->
+        <nav id="userActions" class="nav-actions">
+
+            <!-- Default (Signed Out) -->
+            <a href="/login.html" class="btn secondary-nav">
+                Sign In
+            </a>
+
+            <a href="/signup.html" class="btn primary-nav">
+                Sign Up
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                Report Road Damage
+                <br>
+                Build Better Cities
+            </h1>
+
+            <p>
+                Report potholes, damaged roads and civic issues in just a few clicks.
+                Help your community by making roads safer for everyone.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="report.html?from=home" class="btn hero-btn">
+                    Report an Issue
+                </a>
+
+                <a href="public.html?from=home" class="btn secondary">
+                    View Complaints
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="hero-image">
+
+            <img src="images/hero-road.png"
+                 alt="FixMyRoads Hero Illustration">
+
+        </div>
+
+    </section>
+
+    <!-- STATS -->
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <h2>1200+</h2>
+            <p>Complaints Reported</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>950+</h2>
+            <p>Resolved</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>3 Days</h2>
+            <p>Average Resolution</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>500+</h2>
+            <p>Active Citizens</p>
+        </div>
+
+    </section>
+
+    <!-- HOW IT WORKS -->
+
+    <section class="how-it-works">
+
+        <h2>How It Works</h2>
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">1</div>
+
+                <h3>Report</h3>
+
+                <p>Upload a photo and describe the issue.</p>
+
+            </div>
+
+            <div class="step">
+
+                <div class="step-number">2</div>
+
+                <h3>Verify</h3>
+
+                <p>Authorities verify your complaint.</p>
+
+            </div>
+
+            <div class="step">
+
+                <div class="step-number">3</div>
+
+                <h3>Repair</h3>
+
+                <p>The issue is assigned and repaired.</p>
+
+            </div>
+
+            <div class="step">
+
+                <div class="step-number">4</div>
+
+                <h3>Resolved</h3>
+
+                <p>Track the complaint until completion.</p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- USER NAVIGATION -->
+
+<script>
+
+(function(){
+
+    const nav = document.getElementById("userActions");
+
+    if(!nav) return;
+
+    function renderForSignedIn(user){
+
+        nav.innerHTML = `
+
+            <a href="/report.html" class="btn secondary-nav">
+                Report Issue
+            </a>
+
+            <a href="/mycomplaints.html" class="btn secondary-nav">
+                My Complaints
+            </a>
+
+            <button id="logoutBtn" class="btn primary-nav">
+                Logout
+            </button>
+
+        `;
+
+        document.getElementById("logoutBtn").onclick = async () => {
+
+            try{
+
+                await fetch("/logout",{
+                    method:"POST",
+                    credentials:"include"
+                });
+
+            }catch(e){}
+
+            localStorage.removeItem("dr_user");
+
+            window.location.href="/index.html";
+
+        };
+
+    }
+
+    function renderForSignedOut(){
+
+        nav.innerHTML = `
+
+            <a href="/login.html" class="btn secondary-nav">
+                Sign In
+            </a>
+
+            <a href="/signup.html" class="btn primary-nav">
+                Sign Up
+            </a>
+
+        `;
+
+    }
+
+    const raw = localStorage.getItem("dr_user");
+
+    if(raw){
+
+        try{
+
+            renderForSignedIn(JSON.parse(raw));
+
+        }catch{
+
+            renderForSignedOut();
+
+        }
+
+    }else{
+
+        renderForSignedOut();
+
+    }
+
+})();
+
+</script>
+
+<!-- MOBILE MENU -->
+
+<script>
+
+const navToggle = document.getElementById("navToggle");
+const userActions = document.getElementById("userActions");
+
+if(navToggle){
+
+    navToggle.addEventListener("click",()=>{
+
+        userActions.classList.toggle("open");
+
+    });
+
+}
+
+</script>
+
+<script src="js/app.js"></script>
+
+</body>
+</html>

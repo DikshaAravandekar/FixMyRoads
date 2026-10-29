@@ -1,0 +1,767 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Reports | Fix My Roads</title>
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  
+<style>
+  :root {
+    --primary: #6558f5;
+    --primary-dark: #5145d8;
+    --page-bg: #f5f7fc;
+    --text: #222222;
+    --muted: #718096;
+    --border: #e5e9f2;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+
+  .site-header {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    min-height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    color: var(--primary);
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    text-decoration: none;
+  }
+
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s ease;
+  }
+
+  .back-button:hover {
+    background: #f0edff;
+  }
+
+  .page-heading {
+    padding: 28px 16px 24px;
+    text-align: center;
+  }
+
+  /* Main My Reports heading */
+  .page-heading h1 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .page-heading p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .reports-container {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto 40px;
+  }
+
+  .report-card {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 22px;
+    margin-bottom: 20px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(31, 41, 55, 0.05);
+  }
+
+  .report-photo {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #f1f5f9;
+  }
+
+  .photo-placeholder {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .photo-placeholder span {
+    font-size: 30px;
+  }
+
+  .report-content {
+    min-width: 0;
+  }
+
+  .report-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .report-title {
+    margin: 0;
+    color: var(--primary-dark);
+    font-size: 24px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+  }
+
+  .report-date {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+
+  .status-chip.submitted,
+  .status-chip.pending {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+
+  .status-chip.verified {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .status-chip.inprogress {
+    background: #f5f3ff;
+    color: #6d28d9;
+  }
+
+  .status-chip.resolved {
+    background: #ecfdf5;
+    color: #047857;
+  }
+
+  .status-chip.closed {
+    background: #f1f5f9;
+    color: #475569;
+  }
+
+  .report-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .detail-box {
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid #e5e0ff;
+    border-radius: 10px;
+    background: #fbfaff;
+  }
+
+  .detail-box.full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* Purple headings */
+  .detail-label {
+    margin-bottom: 10px;
+    color: #6558f5;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Description, ID, status and admin remark values in black */
+  .detail-value {
+    margin: 0;
+    color: #222222;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  /* Location and map link */
+  .location-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    min-height: 55px;
+  }
+
+  .location-coordinates {
+    margin: 0;
+    color: #222222;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .map-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 14px;
+    border: 1px solid #ded8ff;
+    border-radius: 9px;
+    background: #f2efff;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s ease;
+  }
+
+  .map-link:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  /* Complaint ID and status values stay black */
+  .detail-box:nth-child(3) .detail-value,
+  .detail-box:nth-child(4) .detail-value {
+    color: #222222;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  /* Admin remarks */
+  .remark-box {
+    border-color: #e2ddff;
+    background: #f7f5ff;
+  }
+
+  .remark-box .detail-label {
+    color: var(--primary);
+  }
+
+  .remark-box .detail-value {
+    color: #222222;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.8;
+  }
+
+  .empty-state,
+  .message {
+    padding: 35px 20px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 8px 28px rgba(31, 41, 55, 0.04);
+  }
+
+  .empty-state .empty-icon {
+    margin-bottom: 12px;
+    font-size: 38px;
+  }
+
+  .empty-state h2 {
+    margin: 0 0 10px;
+    color: var(--primary-dark);
+    font-size: 21px;
+  }
+
+  .empty-state p,
+  .message {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .empty-state p {
+    margin: 0 0 20px;
+  }
+
+  .primary-button {
+    display: inline-flex;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 9px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .primary-button:hover {
+    background: var(--primary-dark);
+  }
+
+  .message a {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* Hide report count and footer */
+  #reportCount,
+  .footer {
+    display: none !important;
+  }
+
+  @media (max-width: 700px) {
+    .header-inner {
+      min-height: 68px;
+    }
+
+    .brand {
+      font-size: 22px;
+    }
+
+    .back-button {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    .page-heading {
+      padding: 24px 12px 20px;
+    }
+
+    .page-heading h1 {
+      font-size: 36px;
+    }
+
+    .reports-container {
+      width: calc(100% - 24px);
+    }
+
+    .report-card {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 15px;
+    }
+
+    .report-photo,
+    .photo-placeholder {
+      height: 210px;
+    }
+
+    .report-title {
+      font-size: 21px;
+    }
+
+    .report-details {
+      grid-template-columns: 1fr;
+    }
+
+    .detail-box.full-width {
+      grid-column: auto;
+    }
+
+    .location-details {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .map-link {
+      justify-self: start;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .header-inner {
+      gap: 8px;
+    }
+
+    .brand {
+      font-size: 19px;
+    }
+
+    .back-button {
+      padding: 9px;
+      font-size: 11px;
+    }
+
+    .report-top {
+      flex-direction: column;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/index.html">Fix My Roads</a>
+
+      <a class="back-button" href="/dashboard.html">
+        &larr; Back to Dashboard
+      </a>
+    </div>
+  </header>
+
+  <section class="page-heading">
+    <h1>My Reports</h1>
+    <p>Track your road complaints and see the latest updates.</p>
+  </section>
+
+  <main class="reports-container">
+    <div id="reportsContainer">
+      <div class="message">Loading your reports...</div>
+    </div>
+  </main>
+
+  <script>
+    (async function loadMyReports() {
+      const container = document.getElementById('reportsContainer');
+
+      function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[character]);
+      }
+
+      function formatDate(value) {
+        if (!value) return 'Date unavailable';
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+          return 'Date unavailable';
+        }
+
+        return date.toLocaleString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit'
+        });
+      }
+
+      function getStatus(status) {
+        const value = status || 'Submitted';
+        const key = value.toLowerCase().replace(/\s+/g, '');
+
+        let className = '';
+
+        if (key === 'verified') className = 'verified';
+        else if (key === 'inprogress') className = 'inprogress';
+        else if (key === 'resolved') className = 'resolved';
+        else if (key === 'closed') className = 'closed';
+        else if (key === 'pending') className = 'pending';
+        else if (key === 'submitted') className = 'submitted';
+
+        return `
+          <span class="status-chip ${className}">
+            ${escapeHTML(value)}
+          </span>
+        `;
+      }
+
+      function getPhoto(complaint) {
+        let photo = '';
+
+        if (Array.isArray(complaint.photos) && complaint.photos.length) {
+          photo = complaint.photos[0];
+        } else if (complaint.imagePath) {
+          photo = complaint.imagePath;
+        }
+
+        if (
+          typeof photo === 'string' &&
+          (photo.startsWith('/uploads/') ||
+           photo.startsWith('uploads/'))
+        ) {
+          const safePath = photo.startsWith('/')
+            ? photo
+            : '/' + photo;
+
+          return `
+            <img
+              src="${escapeHTML(safePath)}"
+              class="report-photo"
+              alt="Photo of reported road issue"
+              loading="lazy"
+            >
+          `;
+        }
+
+        return `
+          <div class="photo-placeholder">
+            <span>📷</span>
+            No photo provided
+          </div>
+        `;
+      }
+
+      function getCoordinates(complaint) {
+        const location = complaint.location;
+
+        const latitude = location?.lat ?? complaint.latitude;
+        const longitude = location?.lng ?? complaint.longitude;
+
+        if (
+          latitude === undefined || latitude === null || latitude === '' ||
+          longitude === undefined || longitude === null || longitude === ''
+        ) {
+          return null;
+        }
+
+        const lat = Number(latitude);
+        const lng = Number(longitude);
+
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+          return null;
+        }
+
+        return { lat, lng };
+      }
+
+      function getLocationText(complaint) {
+        const coordinates = getCoordinates(complaint);
+
+        if (coordinates) {
+          return escapeHTML(
+            `${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)}`
+          );
+        }
+
+        if (
+          typeof complaint.location === 'string' &&
+          complaint.location.trim()
+        ) {
+          return escapeHTML(complaint.location);
+        }
+
+        return 'Location was not provided.';
+      }
+
+      function getMapLink(complaint) {
+        const coordinates = getCoordinates(complaint);
+
+        if (!coordinates) return '';
+
+        const url =
+          `https://www.google.com/maps?q=${coordinates.lat},${coordinates.lng}`;
+
+        return `
+          <a
+            class="map-link"
+            href="${url}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on Google Maps ↗
+          </a>
+        `;
+      }
+
+      function renderComplaint(complaint) {
+        const title = complaint.title || 'Untitled complaint';
+
+        const description =
+          complaint.description || 'No description was provided.';
+
+        const remark =
+          complaint.remark ||
+          complaint.adminRemark ||
+          complaint.remarks ||
+          '';
+
+        const id = complaint._id || complaint.id || '';
+
+        const status = complaint.status || 'Submitted';
+
+        return `
+          <article class="report-card">
+            <div class="report-image">
+              ${getPhoto(complaint)}
+            </div>
+
+            <div class="report-content">
+              <div class="report-top">
+                <div>
+                  <h2 class="report-title">
+                    ${escapeHTML(title)}
+                  </h2>
+
+                  <div class="report-date">
+                    Submitted on ${escapeHTML(formatDate(complaint.createdAt))}
+                  </div>
+                </div>
+
+                <div>${getStatus(status)}</div>
+              </div>
+
+              <div class="report-details">
+                <section class="detail-box full-width">
+                  <div class="detail-label">Description</div>
+                  <p class="detail-value">${escapeHTML(description)}</p>
+                </section>
+
+                <section class="detail-box full-width">
+                  <div class="detail-label">Location</div>
+
+                  <div class="location-details">
+                    <div class="location-coordinates">
+                      ${getLocationText(complaint)}
+                    </div>
+
+                    ${getMapLink(complaint)}
+                  </div>
+                </section>
+
+                <section class="detail-box">
+                  <div class="detail-label">Complaint ID</div>
+                  <p class="detail-value">
+                    ${escapeHTML(id || 'Not available')}
+                  </p>
+                </section>
+
+                <section class="detail-box">
+                  <div class="detail-label">Last Updated Status</div>
+                  <p class="detail-value">${escapeHTML(status)}</p>
+                </section>
+
+                <section class="detail-box full-width remark-box">
+                  <div class="detail-label">Admin Remarks</div>
+                  <p class="detail-value">
+                    ${escapeHTML(
+                      remark || 'No admin remarks have been added yet.'
+                    )}
+                  </p>
+                </section>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      try {
+        const response = await fetch('/api/mycomplaints', {
+          credentials: 'include'
+        });
+
+        if (response.status === 401) {
+          container.innerHTML = `
+            <div class="message">
+              You are not signed in.
+              Please <a href="/login.html">sign in</a> to view your reports.
+            </div>
+          `;
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Server returned status ${response.status}.`);
+        }
+
+        const payload = await response.json();
+
+        const complaints = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload.complaints)
+            ? payload.complaints
+            : [];
+
+        if (complaints.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🛣️</div>
+              <h2>No reports yet</h2>
+              <p>
+                You haven't submitted any road complaints yet.
+                Report a road issue to see it listed here.
+              </p>
+              <a href="/index.html" class="primary-button">
+                Report a Road Issue
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = complaints.map(renderComplaint).join('');
+
+      } catch (error) {
+        console.error('Unable to load your reports:', error);
+
+        container.innerHTML = `
+          <div class="message">
+            We couldn't load your reports. Please refresh the page and try again.
+          </div>
+        `;
+      }
+    })();
+  </script>
+</body>
+</html>
+
+

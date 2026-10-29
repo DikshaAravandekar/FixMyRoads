@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Road Issue | FixMyRoads</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="dashboard.html" class="brand">FixMyRoads</a>
+
+        <nav class="nav-actions">
+            <a href="index.html" id="backButton" class="btn secondary-nav">
+    ← Back to Home
+</a>
+        </nav>
+    </div>
+</header>
+
+
+<section class="report-hero">
+<h1>Report a Road Issue</h1>
+<p>Help local authorities identify and resolve road damage by submitting accurate reports.</p>
+</section>
+
+<section class="report-section">
+<div class="report-card">
+<h2>Create a New Complaint</h2>
+
+<form id="complaintForm" enctype="multipart/form-data">
+
+<div class="form-section">
+<h3>1. Issue Details</h3>
+</div>
+
+<div class="field">
+<label for="title">Issue Title</label>
+<input type="text" id="title" required>
+</div>
+
+<div class="field">
+<label for="category">Issue Category</label>
+<select id="category">
+<option>Pothole</option><option>Road Crack</option><option>Broken Footpath</option>
+<option>Water Logging</option><option>Road Blockage</option>
+<option>Street Damage</option><option>Other</option>
+</select>
+</div>
+
+<div class="field">
+<label>Severity</label>
+<div class="severity-grid">
+<label class="severity-card"><input type="radio" name="severity" value="Low" checked><div><span class="severity-dot low"></span><h4>Low</h4><p>Minor issue</p></div></label>
+<label class="severity-card"><input type="radio" name="severity" value="Medium"><div><span class="severity-dot medium"></span><h4>Medium</h4><p>Needs attention</p></div></label>
+<label class="severity-card"><input type="radio" name="severity" value="High"><div><span class="severity-dot high"></span><h4>High</h4><p>Immediate action</p></div></label>
+</div>
+</div>
+
+<div class="field">
+<label for="description">Description</label>
+<textarea id="description" rows="6" maxlength="500"  required></textarea>
+<div class="character-count"><span id="charCount">0</span> / 500</div>
+</div>
+
+<div class="form-section">
+<h3>2. Upload Photo</h3>
+</div>
+
+<div class="field">
+<div class="upload-area" id="uploadArea">
+<div class="upload-icon">Upload Image</div>
+<h3>Drag & Drop your image</h3>
+<p>or select a file from your computer</p>
+<small>PNG, JPG or JPEG • Maximum 5 MB</small>
+<input type="file" id="image" accept="image/*" hidden>
+<br><br>
+<button type="button" id="browseBtn" class="btn hero-btn">Browse Files</button>
+</div>
+<div id="previewContainer"><img id="previewImage" alt="Preview"></div>
+</div>
+
+<div class="form-section">
+<h3>3. Location</h3>
+</div>
+
+<div class="field">
+<div class="location-actions">
+<button type="button" id="detectLocation" class="btn secondary-nav">Detect Current Location</button>
+<span id="locationStatus">Current Status: Location not detected</span>
+</div>
+<input type="text" id="address" placeholder="Street / Area">
+<input type="text" id="landmark" placeholder="Nearby Landmark">
+<input type="hidden" id="latitude">
+<input type="hidden" id="longitude">
+</div>
+
+
+
+<div class="checkbox-row">
+<label><input type="checkbox" id="anonymous">Submit complaint anonymous</label>
+</div>
+
+<div class="submit-area">
+<button type="submit" id="submitBtn" class="btn hero-btn submit-btn">Submit Complaint</button>
+</div>
+
+</form>
+</div>
+</section>
+
+<div class="success-modal" id="successModal">
+<div class="success-card">
+<h2>Complaint Submitted Successfully</h2>
+<p>Your complaint has been submitted successfully.</p>
+<div class="success-buttons">
+<a href="mycomplaints.html" class="btn hero-btn">View My Reports</a>
+<a href="dashboard.html" class="btn secondary-nav">Back to Home</a>
+</div>
+</div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+<div class="loader"></div>
+<p>Submitting Complaint...</p>
+</div>
+
+<script src="js/report.js"></script>
+</body>
+</html>

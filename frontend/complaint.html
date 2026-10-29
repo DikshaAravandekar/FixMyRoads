@@ -1,0 +1,489 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Complaint Details | FixMyRoads</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f7f9fc;
+            color: #1f2937;
+        }
+
+        /* Header alignment */
+        .site-header .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .site-header .header-inner .brand {
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .back-community-btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .details-main {
+            max-width: 1100px;
+            margin: 45px auto 80px;
+            padding: 0 22px;
+        }
+
+        .details-card {
+            background: #fff;
+            padding: 35px;
+            border-radius: 22px;
+            box-shadow: 0 12px 40px rgba(31, 41, 55, 0.07);
+        }
+
+        .details-heading {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 22px;
+            margin-bottom: 25px;
+        }
+
+        .details-heading h1 {
+            font-size: 34px;
+            line-height: 1.3;
+            margin: 0 0 15px;
+            overflow-wrap: anywhere;
+        }
+
+        .details-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 30px;
+        }
+
+        .details-image {
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .details-image img {
+            display: block;
+            width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+        }
+
+        .no-image {
+            color: #64748b;
+            text-align: center;
+            padding: 35px;
+        }
+
+        .no-image span {
+            display: block;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .details-info {
+            display: grid;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .info-box {
+            padding: 19px;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            background: #fff;
+            min-width: 0;
+        }
+
+        .info-box h3 {
+            font-size: 16px;
+            margin: 0 0 9px;
+            color: #1f2937;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .status-label {
+            display: inline-block;
+            padding: 7px 15px;
+            border-radius: 30px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-resolved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-progress {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-verified {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .details-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .details-button {
+            display: inline-block;
+            padding: 13px 21px;
+            border-radius: 12px;
+            border: 1px solid #6c63ff;
+            text-decoration: none;
+            font-family: inherit;
+            font-weight: 600;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .details-button.secondary {
+            background: #fff;
+            color: #665cff;
+        }
+
+        .details-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px rgba(108, 99, 255, 0.16);
+        }
+
+        .details-loading {
+            text-align: center;
+            padding: 70px 20px;
+            background: #fff;
+            border-radius: 18px;
+        }
+
+        .details-loading a {
+            color: #665cff;
+        }
+
+        @media (max-width: 700px) {
+            .site-header .header-inner {
+                gap: 10px;
+            }
+
+            .site-header .header-inner .brand {
+                font-size: 20px;
+            }
+
+            .back-community-btn {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .details-main {
+                margin-top: 25px;
+                padding: 0 14px;
+            }
+
+            .details-card {
+                padding: 20px;
+            }
+
+            .details-heading h1 {
+                font-size: 27px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .details-image {
+                min-height: 200px;
+            }
+
+            .details-actions {
+                flex-direction: column;
+            }
+
+            .details-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+
+        <a href="index.html" class="brand" id="brandLink">
+            FixMyRoads
+        </a>
+
+        <a href="public.html"
+           class="btn secondary-nav back-community-btn"
+           id="backToCommunity">
+            ← Back to Community Reports
+        </a>
+
+    </div>
+</header>
+
+<main class="details-main">
+    <div id="content">
+        <div class="details-loading">
+            <h2>Loading complaint details...</h2>
+            <p>Please wait.</p>
+        </div>
+    </div>
+</main>
+
+<script>
+(async function () {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    // Remember which page the visitor came from.
+    const from = params.get("from");
+    const source = from === "dashboard" ? "dashboard" : "home";
+
+    const communityUrl = source === "dashboard"
+        ? "public.html?from=dashboard"
+        : "public.html?from=home";
+
+    const reportUrl = source === "dashboard"
+        ? "report.html?from=dashboard"
+        : "report.html?from=home";
+
+    const content = document.getElementById("content");
+    const brand = document.getElementById("brandLink");
+    const backToCommunity = document.getElementById("backToCommunity");
+
+    // Set the correct destinations.
+    brand.href = source === "dashboard"
+        ? "dashboard.html"
+        : "index.html";
+
+    backToCommunity.href = communityUrl;
+
+    function escapeHtml(value = "") {
+        return String(value).replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        }[char]));
+    }
+
+    function getLocation(complaint) {
+        const location = complaint.location;
+
+        if (typeof location === "string" && location.trim()) {
+            return location;
+        }
+
+        if (location && typeof location === "object") {
+            if (location.address) return location.address;
+            if (location.name) return location.name;
+            if (location.formattedAddress) {
+                return location.formattedAddress;
+            }
+
+            const lat = location.latitude ?? location.lat;
+            const lng = location.longitude ?? location.lng;
+
+            if (lat != null && lng != null) {
+                return `${lat}, ${lng}`;
+            }
+        }
+
+        const latitude = complaint.latitude ?? complaint.lat;
+        const longitude = complaint.longitude ?? complaint.lng;
+
+        if (latitude != null && longitude != null) {
+            return `${latitude}, ${longitude}`;
+        }
+
+        return "Location unavailable";
+    }
+
+    function statusHtml(status) {
+        const value = String(status || "Pending");
+        const normalized = value.toLowerCase().replace(/[\s_-]/g, "");
+
+        let cssClass = "status-label";
+
+        if (normalized === "resolved" || normalized === "closed") {
+            cssClass += " status-resolved";
+        } else if (normalized === "inprogress") {
+            cssClass += " status-progress";
+        } else if (normalized === "verified") {
+            cssClass += " status-verified";
+        }
+
+        return `<span class="${cssClass}">${escapeHtml(value)}</span>`;
+    }
+
+    function showError(title, message) {
+        content.innerHTML = `
+            <div class="details-loading">
+                <h2>${escapeHtml(title)}</h2>
+                <p>${escapeHtml(message)}</p>
+                <a class="details-button secondary"
+                   href="${communityUrl}">
+                    ← Back to Community Reports
+                </a>
+            </div>
+        `;
+    }
+
+    if (!id) {
+        showError("Complaint not found", "No complaint ID was provided.");
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `${window.location.origin}/api/complaints/${encodeURIComponent(id)}`
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                response.status === 404
+                    ? "This complaint could not be found."
+                    : "The server could not load this complaint."
+            );
+        }
+
+        const complaint = await response.json();
+
+        const title = complaint.title || "Untitled complaint";
+        const description = complaint.description || "No description provided.";
+        const location = getLocation(complaint);
+        const reporter = complaint.createdBy || "Anonymous";
+
+        const createdAt = complaint.createdAt
+            ? new Date(complaint.createdAt).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            })
+            : "Date unavailable";
+
+        // Support imagePath and photos array formats.
+        let imagePath = complaint.imagePath;
+
+        if (!imagePath && Array.isArray(complaint.photos) && complaint.photos.length) {
+            imagePath = complaint.photos[0];
+        }
+
+        const safeImage = imagePath ? escapeHtml(imagePath) : "";
+        const remarks = complaint.remark || complaint.remarks || "No remarks yet.";
+
+        content.innerHTML = `
+            <article class="details-card">
+
+                <div class="details-heading">
+                    <h1>${escapeHtml(title)}</h1>
+
+                    <div class="details-meta">
+                        <span>👤 Reported by ${escapeHtml(reporter)}</span>
+                        <span>📅 ${escapeHtml(createdAt)}</span>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+
+                    <div class="details-image">
+                        ${
+                            safeImage
+                                ? `<img src="${safeImage}"
+                                        alt="Photo of ${escapeHtml(title)}"
+                                        onerror="this.parentElement.innerHTML='<div class=&quot;no-image&quot;><span>📷</span>Image unavailable</div>'">`
+                                : `<div class="no-image">
+                                       <span>📷</span>
+                                       No image uploaded
+                                   </div>`
+                        }
+                    </div>
+
+                    <div class="details-info">
+
+                        <section class="info-box">
+                            <h3>Description</h3>
+                            <p>${escapeHtml(description)}</p>
+                        </section>
+
+                        <section class="info-box">
+                            <h3>📍 Location</h3>
+                            <p>${escapeHtml(location)}</p>
+                        </section>
+
+                        <section class="info-box">
+                            <h3>Complaint Status</h3>
+                            ${statusHtml(complaint.status)}
+                        </section>
+
+                        <section class="info-box">
+                            <h3>Admin Remarks</h3>
+                            <p>${escapeHtml(remarks)}</p>
+                        </section>
+
+                    </div>
+                </div>
+            </article>
+        `;
+
+    } catch (error) {
+        console.error("Unable to load complaint:", error);
+
+        showError(
+            "Unable to load complaint",
+            error.message || "Please try again later."
+        );
+    }
+})();
+</script>
+
+</body>
+</html>
+

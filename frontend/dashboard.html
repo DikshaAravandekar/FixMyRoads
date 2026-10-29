@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | FixMyRoads</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+
+        <a href="dashboard.html" class="brand">
+            FixMyRoads
+        </a>
+
+        <nav class="nav-actions">
+            <a href="report.html?from=dashboard" class="btn hero-btn">
+                Report Issue
+            </a>
+
+            <a href="mycomplaints.html?from=dashboard" class="btn secondary-nav">
+                My Reports
+            </a>
+
+            <a href="public.html?from=dashboard" class="btn secondary-nav">
+                Community Reports
+            </a>
+
+            <button id="logoutBtn" type="button" class="btn primary-nav">
+                Logout
+            </button>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+    <!-- Welcome Section -->
+    <section class="dashboard-hero">
+        <h1 id="welcomeUser">Welcome</h1>
+    </section>
+
+    <!-- Statistics -->
+    <section class="dashboard-stats">
+
+        <div class="stat-card">
+            <h3>Total Reports</h3>
+            <h2 id="totalCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Pending</h3>
+            <h2 id="pendingCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>In Progress</h3>
+            <h2 id="progressCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Resolved</h3>
+            <h2 id="resolvedCount">0</h2>
+        </div>
+
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+
+        <a href="report.html?from=dashboard" class="action-card">
+            <div class="action-icon">📍</div>
+            <h3>Report an Issue</h3>
+            <p>Upload a road complaint with photos and GPS location.</p>
+        </a>
+
+        <a href="mycomplaints.html?from=dashboard" class="action-card">
+            <div class="action-icon">📋</div>
+            <h3>My Reports</h3>
+            <p>Track all your submitted complaints.</p>
+        </a>
+
+        <a href="public.html?from=dashboard" class="action-card">
+            <div class="action-icon">🌍</div>
+            <h3>Community Reports</h3>
+            <p>Explore road issues reported by other citizens.</p>
+        </a>
+
+    </section>
+
+</main>
+
+<script>
+
+// Get the logged-in user
+let user = null;
+
+try {
+    user = JSON.parse(localStorage.getItem("dr_user") || "null");
+} catch (error) {
+    user = null;
+}
+
+// Redirect users who are not signed in
+if (!user) {
+    window.location.href = "login.html";
+} else {
+
+    // Display the actual name, never the email username
+    const name = (
+        user.name ||
+        user.fullName ||
+        user.firstName ||
+        user.displayName ||
+        ""
+    ).trim();
+
+    document.getElementById("welcomeUser").textContent =
+        name ? `Welcome, ${name}` : "Welcome";
+}
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+
+    try {
+        await fetch("/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+    } catch (error) {
+        console.error("Logout error:", error);
+    }
+
+    localStorage.removeItem("dr_user");
+    window.location.href = "index.html";
+});
+
+// Load complaint statistics
+(async function () {
+
+    try {
+        const response = await fetch("/api/mycomplaints", {
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to load complaints");
+        }
+
+        const data = await response.json();
+
+        const complaints = Array.isArray(data.complaints)
+            ? data.complaints
+            : Array.isArray(data)
+                ? data
+                : [];
+
+        let pending = 0;
+        let progress = 0;
+        let resolved = 0;
+
+        complaints.forEach(complaint => {
+
+            const status = (complaint.status || "Pending")
+                .toLowerCase()
+                .replace(/\s+/g, "");
+
+            if (status === "resolved") {
+                resolved++;
+            } else if (
+                status === "inprogress" ||
+                status === "verified"
+            ) {
+                progress++;
+            } else {
+                pending++;
+            }
+
+        });
+
+        document.getElementById("totalCount").textContent =
+            complaints.length;
+
+        document.getElementById("pendingCount").textContent =
+            pending;
+
+        document.getElementById("progressCount").textContent =
+            progress;
+
+        document.getElementById("resolvedCount").textContent =
+            resolved;
+
+    } catch (error) {
+        console.error("Unable to load complaint statistics:", error);
+    }
+
+})();
+
+</script>
+
+</body>
+</html>

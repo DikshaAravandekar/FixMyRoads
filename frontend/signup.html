@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sign up — Fix My Roads</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html">Fix My Roads</a>
+  </div>
+</header>
+
+
+  <main class="login-wrap">
+    <div class="login-card card">
+      <section class="auth-hero">
+
+    <h1>Create Your Account</h1>
+
+    <p>
+        Join FixMyRoads to report road issues, track complaint progress,
+        and help build safer roads in your city.
+    </p>
+
+</section>
+
+      <form id="signupForm" novalidate>
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" placeholder="e.g. Diksha Aravandekar" required />
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required />
+        </div>
+
+        <!-- Password -->
+
+<div class="field">
+    <label for="password">Password</label>
+
+    <div class="password-wrapper">
+
+        <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Create a password"
+            required
+        >
+
+        <button
+            type="button"
+            class="toggle-password"
+            data-target="password"
+        >
+            Show
+        </button>
+
+    </div>
+</div>
+<div class="field">
+    <label for="confirmPassword">Confirm Password</label>
+    <div class="password-wrapper">
+      <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm your password" required>
+      <button type="button" class="toggle-password" data-target="confirmPassword">Show</button>
+    </div>
+</div>
+        
+          <div class="field" style="flex:1;">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" placeholder="Optional" />
+          </div>
+
+          <div class="field" style="width:140px;">
+            <input type="hidden" id="role" value="citizen">
+          </div>
+        </div>
+
+        <div class="actions">
+
+    <button
+        type="submit"
+        class="btn">
+        Create Account
+    </button>
+
+</div>
+
+<div class="login-link">
+
+    Already have an account?
+
+    <a href="login.html">
+        Sign In
+    </a>
+
+</div>
+
+<p id="signupMsg"></p>
+
+</form>
+
+</div>
+
+</main>
+
+<script>
+document.getElementById("signupForm").addEventListener("submit", async function (e) {
+
+    e.preventDefault();
+
+    const msg = document.getElementById("signupMsg");
+    msg.textContent = "";
+    msg.style.color = "#d32f2f";
+
+    // Get form values
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const phone = document.getElementById("phone").value.trim();
+    const role = document.getElementById("role").value;
+
+    // Validation
+
+    if (!name || !email || !password) {
+        msg.textContent = "Please fill in all required fields.";
+        return;
+    }
+
+    if (password.length < 8) {
+        msg.textContent = "Password must be at least 8 characters long.";
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        msg.textContent = "Passwords do not match.";
+        return;
+    }
+
+    try {
+
+        const res = await fetch("/signup", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            credentials: "include",
+
+            body: JSON.stringify({
+                name,
+                email,
+                password,
+                phone,
+                role
+            })
+
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+            msg.textContent = data.error || "Signup failed.";
+            return;
+        }
+
+        // Save logged-in user
+
+        try {
+    localStorage.setItem(
+        "dr_user",
+        JSON.stringify({
+            id: data.id,
+            role: data.role,
+            email: email,
+            name: document.getElementById("name").value.trim()
+        })
+    );
+} catch (e) {}
+
+        msg.style.color = "green";
+        msg.textContent = "Account created successfully! Redirecting...";
+
+        setTimeout(() => {
+
+            if (data.role === "admin") {
+                window.location.href = "/admin.html";
+            } else {
+                window.location.href = "/dashboard.html";
+            }
+
+        }, 1000);
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+        msg.textContent = "Network error. Please try again.";
+
+    }
+
+});
+
+
+// =====================================
+// Show / Hide Password
+// =====================================
+
+document.querySelectorAll(".toggle-password").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const input = document.getElementById(button.dataset.target);
+
+        if (input.type === "password") {
+
+            input.type = "text";
+            button.textContent = "Hide";
+
+        }
+
+        else {
+
+            input.type = "password";
+            button.textContent = "Show";
+
+        }
+
+    });
+
+});
+</script>
+</body>
+</html>
