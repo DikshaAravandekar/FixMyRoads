@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -390,7 +389,10 @@ app.post('/api/complaints', (req, res, next) => {
         category,
         severity,
         latitude,
-        longitude
+        longitude,
+        address,
+        landmark,
+        anonymous
       } = req.body || {};
 
       if (!title || !description) {
@@ -406,23 +408,45 @@ app.post('/api/complaints', (req, res, next) => {
       // Prefer the authenticated user's ID over any client-supplied ID.
       const reporterValue = req.session?.userId || undefined;
 
+      const hasLatitude = latitude !== undefined && latitude !== '';
+      const hasLongitude = longitude !== undefined && longitude !== '';
+      const hasLocationDetails = Boolean(
+        hasLatitude ||
+        hasLongitude ||
+        (typeof address === 'string' && address.trim()) ||
+        (typeof landmark === 'string' && landmark.trim())
+      );
+
+      const parsedLatitude = hasLatitude ? Number(latitude) : undefined;
+      const parsedLongitude = hasLongitude ? Number(longitude) : undefined;
+
+      if (
+        (hasLatitude && !Number.isFinite(parsedLatitude)) ||
+        (hasLongitude && !Number.isFinite(parsedLongitude))
+      ) {
+        return res.status(400).json({
+          message: 'Latitude and longitude must be valid numbers.'
+        });
+      }
+
+      const isAnonymous = anonymous === true ||
+        String(anonymous).toLowerCase() === 'true';
+
       const complaint = new Complaint({
-        title,
-        description,
+        title: String(title).trim(),
+        description: String(description).trim(),
         category,
         severity,
         photos: imagePath ? [imagePath] : [],
-        location: (latitude !== undefined && latitude !== '') ||
-                  (longitude !== undefined && longitude !== '')
+        location: hasLocationDetails
           ? {
-              lat: latitude !== undefined && latitude !== ''
-                ? Number(latitude)
-                : undefined,
-              lng: longitude !== undefined && longitude !== ''
-                ? Number(longitude)
-                : undefined
+              lat: parsedLatitude,
+              lng: parsedLongitude,
+              address: typeof address === 'string' ? address.trim() : '',
+              landmark: typeof landmark === 'string' ? landmark.trim() : ''
             }
           : undefined,
+        anonymous: isAnonymous,
         reporter: reporterValue
       });
 
@@ -450,10 +474,18 @@ app.post('/api/complaints', (req, res, next) => {
 app.get('/api/complaints', async (req, res) => {
   try {
     const complaints = await Complaint.find()
+      .populate('reporter', 'name')
       .sort({ createdAt: -1 })
       .limit(200);
 
-    return res.json(complaints);
+    // Do not expose the reporter's identity for anonymous complaints.
+    const publicComplaints = complaints.map((complaint) => {
+      const data = complaint.toObject();
+      if (data.anonymous) data.reporter = null;
+      return data;
+    });
+
+    return res.json(publicComplaints);
   } catch (err) {
     console.error('Get complaints error:', err);
 
@@ -473,11 +505,11 @@ app.get('/api/complaints/:id', async (req, res) => {
     let complaint = null;
 
     if (mongoose.isValidObjectId(id)) {
-      complaint = await Complaint.findById(id);
+      complaint = await Complaint.findById(id).populate('reporter', 'name');
     }
 
     if (!complaint) {
-      complaint = await Complaint.findOne({ id });
+      complaint = await Complaint.findOne({ id }).populate('reporter', 'name');
     }
 
     if (!complaint) {
@@ -486,7 +518,10 @@ app.get('/api/complaints/:id', async (req, res) => {
       });
     }
 
-    return res.json(complaint);
+    const complaintData = complaint.toObject();
+    if (complaintData.anonymous) complaintData.reporter = null;
+
+    return res.json(complaintData);
   } catch (err) {
     console.error('Get single complaint error:', err);
 
