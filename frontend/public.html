@@ -240,74 +240,83 @@
         }
 
         function render(list) {
-            if (list.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6">
-                            <div class="loading">
-                                No matching complaints found.
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    if (list.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    <div class="loading">
+                        No matching complaints found.
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
-            tbody.innerHTML = list.map(c => {
-                const id = encodeURIComponent(c._id || c.id || "");
-                const imagePath = c.imagePath
-                    ? escapeHtml(c.imagePath)
-                    : "";
+    tbody.innerHTML = list.map(c => {
+        const id = encodeURIComponent(c._id || c.id || "");
 
-                return `
-                    <tr>
-                        <td>
-                            ${
-                                imagePath
-                                ? `<a href="${imagePath}" target="_blank"
-                                      rel="noopener noreferrer">
-                                       <img src="${imagePath}"
-                                            class="thumb"
-                                            alt="Complaint photo">
-                                   </a>`
-                                : `<div class="no-photo">📷</div>`
-                            }
-                        </td>
+        // Support both the old and current photo fields.
+        const photo = Array.isArray(c.photos)
+            ? c.photos[0]
+            : (c.imagePath || c.photo || "");
 
-                        <td>
-                            <div class="issue-title">
-                                ${escapeHtml(c.title || "Road issue")}
-                            </div>
+        const imagePath = photo
+            ? (photo.startsWith("http") || photo.startsWith("/")
+                ? photo
+                : `/uploads/${photo}`)
+            : "";
 
-                            <div class="issue-date">
-                                Reported on
-                                ${formatDate(c.createdAt)}
-                            </div>
-                        </td>
+        // Support populated reporter information.
+        const reportedBy =
+            c.createdBy ||
+            (typeof c.reporter === "object"
+                ? c.reporter?.name || c.reporter?.email
+                : "") ||
+            "Anonymous";
 
-                        <td>
-                            ${escapeHtml(c.createdBy || "Anonymous")}
-                        </td>
+        return `
+            <tr>
+                <td>
+                    ${
+                        imagePath
+                            ? `<a href="${escapeHtml(imagePath)}"
+                                  target="_blank"
+                                  rel="noopener noreferrer">
+                                   <img src="${escapeHtml(imagePath)}"
+                                        class="thumb"
+                                        alt="Complaint photo"
+                                        onerror="this.style.display='none'">
+                               </a>`
+                            : `<div class="no-photo">📷</div>`
+                    }
+                </td>
 
-                        <td>
-                            ${getLocation(c)}
-                        </td>
+                <td>
+                    <div class="issue-title">
+                        ${escapeHtml(c.title || "Road issue")}
+                    </div>
+                    <div class="issue-date">
+                        Reported on ${formatDate(c.createdAt)}
+                    </div>
+                </td>
 
-                        <td>
-                            ${statusChip(c.status)}
-                        </td>
+                <td>${escapeHtml(reportedBy)}</td>
 
-                        <td>
-                            <a
-                                href="complaint.html?id=${id}&from=${from}"
-                                class="btn secondary-nav btn-small">
-                                👁 View Details
-                            </a>
-                        </td>
-                    </tr>
-                `;
-            }).join("");
-        }
+                <td>${getLocation(c)}</td>
+
+                <td>${statusChip(c.status)}</td>
+
+                <td>
+                    <a href="complaint.html?id=${id}&from=${from}"
+                       class="btn secondary-nav btn-small">
+                        👁 View Details
+                    </a>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
 
     } catch (error) {
         console.error("Community reports error:", error);
@@ -337,32 +346,41 @@
             year: "numeric"
         });
     }
+function getLocation(c) {
+    const location = c.location;
 
-    function getLocation(c) {
-        if (typeof c.location === "string" && c.location) {
-            return "📍 " + escapeHtml(c.location);
-        }
-
-        if (c.location && typeof c.location === "object") {
-            if (c.location.address) {
-                return "📍 " + escapeHtml(c.location.address);
-            }
-
-            if (c.location.name) {
-                return "📍 " + escapeHtml(c.location.name);
-            }
-        }
-
-        const lat = Number(c.latitude ?? c.location?.latitude);
-        const lng = Number(c.longitude ?? c.location?.longitude);
-
-        if (Number.isFinite(lat) && Number.isFinite(lng) &&
-            (lat !== 0 || lng !== 0)) {
-            return `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        }
-
-        return "📍 Location unavailable";
+    if (typeof location === "string" && location.trim()) {
+        return `📍 ${escapeHtml(location)}`;
     }
+
+    if (location && typeof location === "object") {
+        if (location.address) {
+            return `📍 ${escapeHtml(location.address)}`;
+        }
+
+        if (location.name) {
+            return `📍 ${escapeHtml(location.name)}`;
+        }
+    }
+
+    const lat = Number(
+        location?.lat ?? location?.latitude ?? c.latitude
+    );
+
+    const lng = Number(
+        location?.lng ?? location?.longitude ?? c.longitude
+    );
+
+    if (
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        (lat !== 0 || lng !== 0)
+    ) {
+        return `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+
+    return "📍 Location unavailable";
+}
 
     function statusChip(status) {
         const s = (status || "Pending")

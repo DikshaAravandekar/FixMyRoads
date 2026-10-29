@@ -209,10 +209,7 @@ if (form) {
                 document.getElementById("anonymous").checked);
 
             if (imageInput.files.length) {
-
-                formData.append("image",
-                    imageInput.files[0]);
-
+                formData.append("photo", imageInput.files[0]);
             }
 
             const response = await fetch("/api/complaints", {
@@ -228,9 +225,12 @@ if (form) {
             loading.style.display = "none";
 
             if (!response.ok) {
-
-                throw new Error();
-
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    errorData.error || 
+                    errorData.message ||
+                    `Request failed with status ${response.status}`
+                );
             }
 
             successModal.style.display = "flex";
@@ -245,12 +245,10 @@ if (form) {
 
         }
 
-        catch {
-
+        catch (error) {
             loading.style.display = "none";
-
-            alert("Unable to submit complaint. Please try again.");
-
+            console.error("Complaint submission error:", error);
+            alert(error.message || "Unable to submit complaint. Please try again.");
         }
 
     });
